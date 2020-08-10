@@ -38,6 +38,8 @@ namespace Microsoft.Xna.Framework
 		{
 			string safeName = MonoGame.Utilities.FileHelpers.NormalizeFilePathSeparators(name);
 
+            System.Diagnostics.Debug.WriteLine($"\"{name}\",");
+
 #if CASE_SENSITIVITY_HACK
 			if (Path.IsPathRooted(safeName))
 			{

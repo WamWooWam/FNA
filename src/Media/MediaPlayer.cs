@@ -24,7 +24,7 @@ namespace Microsoft.Xna.Framework.Media
 			{
 				/* This is based on whether or not the player is playing custom
 				 * music, rather than yours.
-				 * -flibit
+				 * -flibitFq
 				 */
 				return true;
 			}
@@ -255,10 +255,10 @@ namespace Microsoft.Xna.Framework.Media
 			timer.Stop();
 			timer.Reset();
 
-			for (int i = 0; i < Queue.Count; i += 1)
-			{
-				Queue[i].PlayCount = 0;
-			}
+			//for (int i = 0; i < Queue.Count; i += 1)
+			//{
+			//	Queue[i].PlayCount = 0;
+			//}
 
 			State = MediaState.Stopped;
 		}
@@ -334,7 +334,7 @@ namespace Microsoft.Xna.Framework.Media
 
 		#region Private Static Methods
 
-		private static void LoadSong(Song song)
+		public static void LoadSong(Song song)
 		{
 			/* Believe it or not, XNA duplicates the Song object
 			 * and then assigns a bunch of stuff to it at Play time.
@@ -345,16 +345,9 @@ namespace Microsoft.Xna.Framework.Media
 
 		private static void NextSong(int direction)
 		{
-			Stop();
 			if (IsRepeating && Queue.ActiveSongIndex >= Queue.Count - 1)
 			{
-				Queue.ActiveSongIndex = 0;
-
-				/* Setting direction to 0 will force the first song
-				 * in the queue to be played.
-				 * if we're on "shuffle", then it'll pick a random one
-				 * anyway, regardless of the "direction".
-				 */
+				Queue.ActiveSongIndex = Queue.Count - 1;
 				direction = 0;
 			}
 
@@ -371,6 +364,7 @@ namespace Microsoft.Xna.Framework.Media
 				);
 			}
 
+			Stop();
 			Song nextSong = Queue[Queue.ActiveSongIndex];
 			if (nextSong != null)
 			{
