@@ -31,7 +31,8 @@ namespace Microsoft.Xna.Framework
 
 		public static Stream OpenStream(string name)
 		{
-			string safeName = MonoGame.Utilities.FileHelpers.NormalizeFilePathSeparators(name);
+			string safeName = MonoGame.Utilities.FileHelpers.NormalizeFilePathSeparators(name)
+				.ToLowerInvariant();
 
 #if CASE_SENSITIVITY_HACK
 			if (Path.IsPathRooted(safeName))
@@ -53,7 +54,8 @@ namespace Microsoft.Xna.Framework
 
 		internal static IntPtr ReadToPointer(string name, out IntPtr size)
 		{
-			string safeName = MonoGame.Utilities.FileHelpers.NormalizeFilePathSeparators(name);
+			string safeName = MonoGame.Utilities.FileHelpers.NormalizeFilePathSeparators(name)
+				.ToLowerInvariant();
 
 #if CASE_SENSITIVITY_HACK
 			if (Path.IsPathRooted(safeName))

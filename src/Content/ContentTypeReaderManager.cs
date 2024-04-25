@@ -279,7 +279,8 @@ namespace Microsoft.Xna.Framework.Content
 		internal static void AddTypeCreator(
 			string typeString,
 			Func<ContentTypeReader> createFunction
-		) {
+		)
+		{
 			if (!typeCreators.ContainsKey(typeString))
 			{
 				typeCreators.Add(typeString, createFunction);
@@ -357,6 +358,12 @@ namespace Microsoft.Xna.Framework.Content
 					assemblyName
 				)
 			);
+
+			preparedType = preparedType.Replace(
+				", mscorlib",
+				", System.Private.CoreLib"
+			);
+
 			return preparedType;
 		}
 

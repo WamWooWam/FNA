@@ -68,6 +68,14 @@ namespace Microsoft.Xna.Framework.Media
 			}
 		}
 
+		public string EXT_FilePath
+		{
+			get
+			{
+				return handle;
+			}
+		}
+
 		#endregion
 
 		#region Public IDisposable Properties
@@ -90,10 +98,10 @@ namespace Microsoft.Xna.Framework.Media
 
 		internal Song(string fileName, string name = null)
 		{
-			if (!File.Exists(fileName))
-			{
-				throw new FileNotFoundException(fileName);
-			}
+			//if (!File.Exists(fileName))
+			//{
+			//	throw new FileNotFoundException(fileName);
+			//}
 			handle = fileName;
 			Name = name;
 			IsDisposed = false;

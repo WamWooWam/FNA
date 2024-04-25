@@ -334,7 +334,7 @@ namespace Microsoft.Xna.Framework.Media
 
 		#region Private Static Methods
 
-		private static void LoadSong(Song song)
+		public static void LoadSong(Song song)
 		{
 			/* Believe it or not, XNA duplicates the Song object
 			 * and then assigns a bunch of stuff to it at Play time.

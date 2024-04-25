@@ -45,6 +45,7 @@ namespace Microsoft.Xna.Framework.Content
 				throw new ContentLoadException();
 			}
 
+			input.BaseStream.Seek(-4, SeekOrigin.End);
 			int durationMs = input.ReadInt32();
 
 			return new Song(path, durationMs);
@@ -64,10 +65,10 @@ namespace Microsoft.Xna.Framework.Content
 			{
 				// Concatenate the file name with valid extensions.
 				string fileNamePlusExt = fileName + ext;
-				if (File.Exists(fileNamePlusExt))
-				{
+				//if (File.Exists(fileNamePlusExt))
+				//{
 					return fileNamePlusExt;
-				}
+				//}
 			}
 			return null;
 		}
