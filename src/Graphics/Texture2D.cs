@@ -98,7 +98,9 @@ namespace Microsoft.Xna.Framework.Graphics
 						format != SurfaceFormat.HalfSingle &&
 						format != SurfaceFormat.HalfVector2 &&
 						format != SurfaceFormat.HalfVector4 &&
-						format != SurfaceFormat.HdrBlendable	)
+						format != SurfaceFormat.HdrBlendable &&
+						format != SurfaceFormat.ByteEXT &&
+						format != SurfaceFormat.UShortEXT)
 				{
 					// Not a renderable format period
 					Format = SurfaceFormat.Color;
@@ -298,6 +300,25 @@ namespace Microsoft.Xna.Framework.Graphics
 				);
 			}
 
+			int elementSizeInBytes = MarshalHelper.SizeOf<T>();
+			ValidateGetDataFormat(Format, elementSizeInBytes);
+
+			GCHandle handle = GCHandle.Alloc(data, GCHandleType.Pinned);
+			GetDataPointerEXT(
+				level,
+				rect,
+				handle.AddrOfPinnedObject() + (startIndex * elementSizeInBytes),
+				elementCount * elementSizeInBytes
+			);
+			handle.Free();
+		}
+
+		public void GetDataPointerEXT(
+			int level,
+			Rectangle? rect,
+			IntPtr data,
+			int dataLengthBytes
+		) {
 			int subX, subY, subW, subH;
 			if (rect == null)
 			{
@@ -313,11 +334,6 @@ namespace Microsoft.Xna.Framework.Graphics
 				subW = rect.Value.Width;
 				subH = rect.Value.Height;
 			}
-
-			int elementSizeInBytes = MarshalHelper.SizeOf<T>();
-			ValidateGetDataFormat(Format, elementSizeInBytes);
-
-			GCHandle handle = GCHandle.Alloc(data, GCHandleType.Pinned);
 			FNA3D.FNA3D_GetTextureData2D(
 				GraphicsDevice.GLDevice,
 				texture,
@@ -326,10 +342,9 @@ namespace Microsoft.Xna.Framework.Graphics
 				subW,
 				subH,
 				level,
-				handle.AddrOfPinnedObject() + (startIndex * elementSizeInBytes),
-				elementCount * elementSizeInBytes
+				data,
+				dataLengthBytes
 			);
-			handle.Free();
 		}
 
 		#endregion

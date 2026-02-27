@@ -86,7 +86,9 @@ namespace Microsoft.Xna.Framework.Graphics
 		{
 			get
 			{
-				throw new NotImplementedException();
+				return FNAPlatform.GetMonitorHandle(
+					Adapters.IndexOf(this)
+				);
 			}
 		}
 
@@ -144,9 +146,7 @@ namespace Microsoft.Xna.Framework.Graphics
 			{
 				if (adapters == null)
 				{
-					adapters = new ReadOnlyCollection<GraphicsAdapter>(
-						FNAPlatform.GetGraphicsAdapters()
-					);
+					AdaptersChanged();
 				}
 				return adapters;
 			}
@@ -255,7 +255,9 @@ namespace Microsoft.Xna.Framework.Graphics
 
 		internal static void AdaptersChanged()
 		{
-			adapters = null;
+			adapters = new ReadOnlyCollection<GraphicsAdapter>(
+				FNAPlatform.GetGraphicsAdapters()
+			);
 		}
 
 		#endregion

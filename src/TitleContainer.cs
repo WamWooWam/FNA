@@ -40,7 +40,10 @@ namespace Microsoft.Xna.Framework
 			{
 				safeName = GetCaseName(safeName);
 			}
-			safeName = GetCaseName(Path.Combine(TitleLocation.Path, safeName));
+			else
+			{
+				safeName = GetCaseName(Path.Combine(TitleLocation.Path, safeName));
+			}
 #endif
 			if (Path.IsPathRooted(safeName))
 			{
@@ -62,7 +65,10 @@ namespace Microsoft.Xna.Framework
 			{
 				safeName = GetCaseName(safeName);
 			}
-			safeName = GetCaseName(Path.Combine(TitleLocation.Path, safeName));
+			else
+			{
+				safeName = GetCaseName(Path.Combine(TitleLocation.Path, safeName));
+			}
 #endif
 			string realName;
 			if (Path.IsPathRooted(safeName))

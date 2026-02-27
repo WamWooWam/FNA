@@ -237,6 +237,11 @@ namespace Microsoft.Xna.Framework
 			SupportsGlobalMouse = (	OSVersion.Equals("Windows") ||
 						OSVersion.Equals("Mac OS X") ||
 						videoDriver.Equals("x11")	);
+			if (Environment.GetEnvironmentVariable("FNA_MOUSE_DISABLE_GLOBAL_ACCESS") == "1")
+			{
+				// Ignore previous instructions
+				SupportsGlobalMouse = false;
+			}
 
 			// Only iOS and Android care about device orientation.
 			SupportsOrientations = ( OSVersion.Equals("iOS") ||
@@ -305,7 +310,8 @@ namespace Microsoft.Xna.Framework
 				INTERNAL_AddInstance(evt[0].cdevice.which);
 			}
 
-			if (OSVersion.Equals("Windows"))
+			if (	OSVersion.Equals("Windows") &&
+				SDL.SDL_GetHint("FNA_WIN32_IGNORE_WM_PAINT") != "1"	)
 			{
 				/* Windows has terrible event pumping and doesn't give us
 				 * WM_PAINT events correctly. So we get to do this!
@@ -375,16 +381,11 @@ namespace Microsoft.Xna.Framework
 
 		public static void ProgramExit(object sender, EventArgs e)
 		{
-			AudioEngine.ProgramExiting = true;
-
-			if (SoundEffect.FAudioContext.Context != null)
-			{
-				SoundEffect.FAudioContext.Context.Dispose();
-			}
-			Media.MediaPlayer.DisposeIfNecessary();
-
 			// This _should_ be the last SDL call we make...
-			SDL.SDL_Quit();
+			SDL.SDL_QuitSubSystem(
+				SDL.SDL_INIT_VIDEO |
+				SDL.SDL_INIT_GAMECONTROLLER
+			);
 		}
 
 		#endregion
@@ -533,6 +534,11 @@ namespace Microsoft.Xna.Framework
 			if (TouchPanel.WindowHandle == window.Handle)
 			{
 				TouchPanel.WindowHandle = IntPtr.Zero;
+			}
+
+			if (TextInputEXT.WindowHandle == window.Handle)
+			{
+				TextInputEXT.WindowHandle = IntPtr.Zero;
 			}
 
 			SDL.SDL_DestroyWindow(window.Handle);
@@ -852,7 +858,7 @@ namespace Microsoft.Xna.Framework
 			return stripChars;
 		}
 
-		public static void SetTextInputRectangle(Rectangle rectangle)
+		public static void SetTextInputRectangle(IntPtr window, Rectangle rectangle)
 		{
 			SDL.SDL_Rect rect = new SDL.SDL_Rect();
 			rect.x = rectangle.X;
@@ -1188,9 +1194,8 @@ namespace Microsoft.Xna.Framework
 					}
 					else
 					{
-						// Just reset, this is probably a hotplug
-						game.GraphicsDevice.Reset(
-							game.GraphicsDevice.PresentationParameters,
+						// Quietly update, this is probably a hotplug
+						game.GraphicsDevice.QuietlyUpdateAdapter(
 							currentAdapter
 						);
 					}
@@ -1380,6 +1385,11 @@ namespace Microsoft.Xna.Framework
 			);
 		}
 
+		public static IntPtr GetMonitorHandle(int adapterIndex)
+		{
+			return new IntPtr(adapterIndex);
+		}
+
 		#endregion
 
 		#region Mouse Methods
@@ -1395,7 +1405,7 @@ namespace Microsoft.Xna.Framework
 			out ButtonState x2
 		) {
 			uint flags;
-			if (GetRelativeMouseMode())
+			if (GetRelativeMouseMode(window))
 			{
 				flags = SDL.SDL_GetRelativeMouseState(out x, out y);
 			}
@@ -1424,12 +1434,12 @@ namespace Microsoft.Xna.Framework
 			SDL.SDL_ShowCursor(visible ? 1 : 0);
 		}
 
-		public static bool GetRelativeMouseMode()
+		public static bool GetRelativeMouseMode(IntPtr window)
 		{
 			return SDL.SDL_GetRelativeMouseMode() == SDL.SDL_bool.SDL_TRUE;
 		}
 
-		public static void SetRelativeMouseMode(bool enable)
+		public static void SetRelativeMouseMode(IntPtr window, bool enable)
 		{
 			SDL.SDL_SetRelativeMouseMode(
 				enable ?
@@ -1450,7 +1460,7 @@ namespace Microsoft.Xna.Framework
 
 		private static string GetBaseDirectory()
 		{
-			if (Environment.GetEnvironmentVariable("FNA_SDL2_FORCE_BASE_PATH") != "1")
+			if (Environment.GetEnvironmentVariable("FNA_SDL_FORCE_BASE_PATH") != "1")
 			{
 				// If your platform uses a CLR, you want to be in this list!
 				if (	OSVersion.Equals("Windows") ||
@@ -2405,9 +2415,20 @@ namespace Microsoft.Xna.Framework
 		#endregion
 
 		#region TextInput Methods
-		public static bool IsTextInputActive()
+
+		public static bool IsTextInputActive(IntPtr window)
 		{
 			return SDL.SDL_IsTextInputActive() != 0;
+		}
+
+		public static void StartTextInput(IntPtr window)
+		{
+			SDL.SDL_StartTextInput();
+		}
+
+		public static void StopTextInput(IntPtr window)
+		{
+			SDL.SDL_StopTextInput();
 		}
 
 		#endregion
